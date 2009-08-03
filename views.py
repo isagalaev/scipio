@@ -28,7 +28,7 @@ def complete(request, message=_('Authentication failed')):
     if not user:
         return http.HttpResponseForbidden(message)
     auth.login(request, user)
-    data = dict((k[7:], v) for k, v in request.GET.items() if k.startswith('scipio.'))
+    data = dict((str(k[7:]), v) for k, v in request.GET.items() if k.startswith('scipio.'))
     results = signals.authenticated.send(request, profile=user.scipio_profile, **data)
     for r in results:
         if isinstance(r, http.HttpResponse):
