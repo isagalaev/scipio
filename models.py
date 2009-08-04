@@ -10,6 +10,7 @@ class Profile(models.Model):
     openid = models.CharField(max_length=200, unique=True)
     openid_server = models.CharField(max_length=200, blank=True)
     nickname = models.CharField(_(u'Nickname'), max_length=200, null=True, blank=True)
+    autoupdate = models.BooleanField(default=True)
     spamer = models.NullBooleanField()
 
     def __unicode__(self):
@@ -21,6 +22,16 @@ class Profile(models.Model):
             return url
 
         return self.nickname or _pretty_url(self.openid)
+
+    def update_profile(self):
+        '''
+        Reads profile info from HTTP page and updates profile.
+        Currently just reads hCard.
+        '''
+        data = utils.read_hcard(self.openid)
+        if data:
+            for key, value in data.items():
+                setattr(self, key, value)
 
 class WhitelistSource(models.Model):
     url = models.URLField()

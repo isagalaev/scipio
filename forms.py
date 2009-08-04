@@ -3,7 +3,7 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from scipio import authentication, utils
+from scipio import models, authentication, utils
 
 class AuthForm(forms.Form):
     openid_url = forms.CharField(label='OpenID', max_length=200, required=True)
@@ -27,3 +27,22 @@ class AuthForm(forms.Form):
         data = dict(('scipio.%s' % k, v) for k, v in data.items())
         self.request.return_to_args.update(data)
         return self.request.redirectURL(trust_url, return_to)
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = models.Profile
+        fields = ['nickname', 'autoupdate']
+
+    def clean_autoupdate(self):
+        if self.cleaned_data['autoupdate']:
+            self.ext_data = utils.read_hcard(self.instance.openid)
+            if not self.ext_data:
+                raise forms.ValidationError('No readable profile data found on %s' % self.instance.openid)
+        else:
+            self.ext_data = None
+        return self.cleaned_data['autoupdate']
+
+    def save(self):
+        if self.cleaned_data['autoupdate']:
+            self.cleaned_data.update(self.ext_data)
+        return super(ProfileForm, self).save()

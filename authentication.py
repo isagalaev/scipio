@@ -1,47 +1,16 @@
 # -*- coding:utf-8 -*-
-import re
 import md5
-from urllib2 import urlopen
 from datetime import datetime
 
-from BeautifulSoup import BeautifulSoup
 from openid.consumer.consumer import Consumer, SUCCESS, DiscoveryFailure
 from openid.extensions.sreg import SRegRequest, SRegResponse
 from openid.store.filestore import FileOpenIDStore
-
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.conf import settings
 
 from scipio import models, utils, signals
-
-def _read_hcard(self, openid):
-    '''
-    Ищет на странице, на которую указывает openid, микроформамт hCard,
-    и берет оттуда имя, если есть.
-    '''
-    try:
-        file = urlopen(openid).read(512 * 1024)
-    except IOError:
-        return
-    soup = BeautifulSoup(content)
-    vcard = soup.find(None, {'class': re.compile(r'\bvcard\b')})
-    if vcard is None:
-        return
-
-    def _parse_property(class_name):
-        el = vcard.find(None, {'class': re.compile(r'\b%s\b' % class_name)})
-        if el is None:
-            return
-        if el.name == u'abbr' and el['title']:
-            result = el['title']
-        else:
-            result = ''.join([s for s in el.recursiveChildGenerator() if isinstance(s, unicode)])
-        return result.replace('\n',' ').strip().encode(settings.DEFAULT_CHARSET)
-
-    info = dict((n, _parse_property(n)) for n in ['nickname', 'fn'])
-    return info['nickname'] or info['fn']
 
 class OpenIdBackend(object):
     def authenticate(self, session=None, query=None, return_path=None):
@@ -64,7 +33,7 @@ class OpenIdBackend(object):
             if sreg_response is not None:
                 profile.nickname = smart_unicode(sreg_response.get('nickname', sreg_response.get('fullname', '')))
             if not profile.nickname:
-                profile.nickname = _read_hcard(info.identity_url)
+                profile.update_nickname()
             profile.save()
             signals.created.send(sender=profile)
         return user
