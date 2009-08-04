@@ -55,9 +55,11 @@ class OpenIdBackend(object):
         except models.Profile.DoesNotExist:
             unique = md5.new(info.identity_url + str(datetime.now())).hexdigest()[:23] # 30 - len('scipio_')
             user = User.objects.create_user('scipio_%s' % unique, 'user@cicero', User.objects.make_random_password())
-            profile = user.scipio_profile
-            profile.openid = smart_unicode(info.identity_url)
-            profile.openid_server = smart_unicode(info.endpoint.server_url)
+            profile = models.Profile.objects.create(
+                user = user,
+                openid = smart_unicode(info.identity_url),
+                openid_server = smart_unicode(info.endpoint.server_url),
+            )
             sreg_response = SRegResponse.fromSuccessResponse(info)
             if sreg_response is not None:
                 profile.nickname = smart_unicode(sreg_response.get('nickname', sreg_response.get('fullname', '')))
