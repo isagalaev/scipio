@@ -15,7 +15,7 @@ def login(request):
     if request.method == 'POST':
         form = forms.AuthForm(request.session, request.POST)
         if form.is_valid():
-            after_auth_redirect = form.auth_redirect(_post_redirect(request))
+            after_auth_redirect = form.auth_redirect(_post_redirect(request), {'op': 'login'})
             return redirect(after_auth_redirect)
         return_url = _post_redirect(request)
     else:
@@ -27,9 +27,8 @@ def complete(request, message=_('Authentication failed')):
     user = auth.authenticate(session=request.session, query=request.GET, return_path=request.path)
     if not user:
         return http.HttpResponseForbidden(message)
-    auth.login(request, user)
     data = dict((str(k[7:]), v) for k, v in request.GET.items() if k.startswith('scipio.'))
-    results = signals.authenticated.send(request, profile=user.scipio_profile, **data)
+    results = signals.authenticated.send(request, user=user, **data)
     for r in results:
         if isinstance(r, http.HttpResponse):
             response = r
@@ -37,6 +36,11 @@ def complete(request, message=_('Authentication failed')):
     else:
         response = None
     return response or redirect(request.GET.get('redirect', '/'))
+
+def complete_login(sender, user, op=None, **kwargs):
+    if op == 'login':
+        auth.login(sender, user)
+signals.authenticated.connect(complete_login)
 
 @require_POST
 def logout(request):
