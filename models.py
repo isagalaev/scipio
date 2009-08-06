@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.conf import settings
 
+from scipio import utils
+
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='scipio_profile', primary_key=True)
     openid = models.CharField(max_length=200, unique=True)
@@ -29,9 +31,14 @@ class Profile(models.Model):
         Currently just reads hCard.
         '''
         data = utils.read_hcard(self.openid)
+        changes = {}
         if data:
             for key, value in data.items():
-                setattr(self, key, value)
+                old_value = getattr(self, key)
+                if old_value != value:
+                    setattr(self, key, value)
+                    changes[key] = (old_value, value)
+        return changes
 
 class WhitelistSource(models.Model):
     url = models.URLField()
