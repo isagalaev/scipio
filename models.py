@@ -10,7 +10,7 @@ class Profile(models.Model):
     openid = models.CharField(max_length=200, unique=True)
     openid_server = models.CharField(max_length=200, blank=True)
     nickname = models.CharField(_(u'Nickname'), max_length=200, null=True, blank=True)
-    autoupdate = models.BooleanField(default=True)
+    autoupdate = models.BooleanField(_(u'Update automatically'), default=True, db_index=True)
     spamer = models.NullBooleanField()
 
     def __unicode__(self):

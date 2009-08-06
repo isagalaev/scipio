@@ -2,7 +2,9 @@
 import re
 from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
+
 from django.contrib.sites.models import Site
+from django.conf import settings
 
 def absolute_url(url):
     if url.startswith('http://') or url.startswith('https://'):
@@ -11,7 +13,7 @@ def absolute_url(url):
 
 def read_hcard(url):
     try:
-        soup = BeautifulSoup(urlopen(self.openid).read(512 * 1024))
+        soup = BeautifulSoup(urlopen(url).read(512 * 1024))
     except IOError:
         return
     vcard = soup.find(None, {'class': re.compile(r'\bvcard\b')})
