@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 from django import forms
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from scipio import models, authentication, utils
@@ -37,7 +38,7 @@ class ProfileForm(forms.ModelForm):
         if self.cleaned_data['autoupdate']:
             self.ext_data = utils.read_hcard(self.instance.openid)
             if not self.ext_data:
-                raise forms.ValidationError('No readable profile data found on %s' % self.instance.openid)
+                raise forms.ValidationError(_('No readable profile data found on %s') % self.instance.openid)
         else:
             self.ext_data = None
         return self.cleaned_data['autoupdate']
