@@ -1,11 +1,8 @@
 # -*- coding:utf-8 -*-
-import md5
-from datetime import datetime
-
 from openid.consumer.consumer import Consumer, SUCCESS, DiscoveryFailure
-from openid.extensions.sreg import SRegRequest, SRegResponse
+from openid.extensions.sreg import SRegRequest
 from openid.store.filestore import FileOpenIDStore
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -22,18 +19,14 @@ class OpenIdBackend(object):
             profile = models.Profile.objects.get(openid=info.identity_url)
             user = profile.user
         except models.Profile.DoesNotExist:
-            unique = md5.new(info.identity_url + str(datetime.now())).hexdigest()[:23] # 30 - len('scipio_')
-            user = User.objects.create_user('scipio_%s' % unique, 'user@cicero', User.objects.make_random_password())
+            username, nickname = utils.get_names(info)
+            user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
             profile = models.Profile.objects.create(
                 user = user,
                 openid = smart_unicode(info.identity_url),
                 openid_server = smart_unicode(info.endpoint.server_url),
+                nickname = nickname,
             )
-            sreg_response = SRegResponse.fromSuccessResponse(info)
-            if sreg_response is not None:
-                profile.nickname = smart_unicode(sreg_response.get('nickname', sreg_response.get('fullname', '')))
-            if not profile.nickname:
-                profile.update_nickname()
             profile.save()
             signals.created.send(sender=profile)
         return user
