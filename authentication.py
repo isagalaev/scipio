@@ -19,13 +19,14 @@ class OpenIdBackend(object):
             profile = models.Profile.objects.get(openid=info.identity_url)
             user = profile.user
         except models.Profile.DoesNotExist:
-            username, nickname = utils.get_names(info)
+            username, nickname, autoupdate = utils.get_names(info)
             user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
             profile = models.Profile.objects.create(
                 user = user,
                 openid = smart_unicode(info.identity_url),
                 openid_server = smart_unicode(info.endpoint.server_url),
                 nickname = nickname,
+                autoupdate = autoupdate,
             )
             profile.save()
             signals.created.send(sender=profile)

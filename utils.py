@@ -46,17 +46,17 @@ def get_names(openid_info):
     meant to be unique and as nice as possible, a nickname is what a user
     explicitly recommends to use or as nice as possible.
     '''
+    hcard = read_hcard(openid_info.identity_url)
+
     def from_sreg():
         sreg_response = SRegResponse.fromSuccessResponse(openid_info)
         if sreg_response is not None:
             return smart_unicode(sreg_response.get('nickname', sreg_response.get('fullname')))
 
     def from_hcard():
-        hcard = read_hcard(openid_info.identity_url)
         return hcard and hcard.get('nickname')
 
     def from_url():
-        print openid_info.identity_url
         schema, host, path, query, fragment = urlparse.urlsplit(openid_info.identity_url)
         if query: # it's definitely not meant to be remotely readable
             return u'%s%s?%s' % (host, path, query)
@@ -84,4 +84,4 @@ def get_names(openid_info):
         if len(username) > 30:
             username = unique_name()
 
-    return username, nickname
+    return username, nickname, hcard is not None
