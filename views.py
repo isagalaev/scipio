@@ -57,6 +57,7 @@ def openid_whitelist(request):
             profile = models.Profile.objects.get(pk=int(request.POST['id']))
             profile.spamer = False
             profile.save()
+            signals.whitelist.send(sender=profile)
             return redirect(_post_redirect(request))
         except (Profile.DoesNotExist, ValueError, KeyError):
             return http.HttpResponseBadRequest()
