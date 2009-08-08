@@ -18,7 +18,7 @@ class AuthForm(forms.Form):
         try:
             self.request = authentication.create_request(url, self.session)
         except authentication.OpenIdError, e:
-            raise ValidationError(e)
+            raise forms.ValidationError(e)
         return url
 
     def auth_redirect(self, target, data={}):

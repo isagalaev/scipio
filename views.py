@@ -3,7 +3,8 @@ from django.views.decorators.http import require_POST
 from django import http
 from django.utils.translation import ugettext as _
 from django.utils import simplejson
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render_to_response
+from django.template import RequestContext
 from django.contrib import auth
 
 from scipio import models, forms, signals, mimeparse
@@ -21,7 +22,10 @@ def login(request):
     else:
         form = forms.AuthForm(request.session)
         return_url = request.GET.get('redirect', '/')
-    return render_to_response(request, 'scipio/login.html', {'form': form, 'redirect': return_url})
+    return render_to_response('scipio/login.html',
+        {'form': form, 'redirect': return_url},
+        context_instance = RequestContext(request),
+    )
 
 def complete(request, message=_('Authentication failed')):
     user = auth.authenticate(session=request.session, query=request.GET, return_path=request.path)
