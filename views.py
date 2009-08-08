@@ -59,10 +59,10 @@ def openid_whitelist(request):
             profile.save()
             signals.whitelist.send(sender=profile)
             return redirect(_post_redirect(request))
-        except (Profile.DoesNotExist, ValueError, KeyError):
+        except (models.Profile.DoesNotExist, ValueError, KeyError):
             return http.HttpResponseBadRequest()
     else:
-        openids = (p.openid for p in Profile.objects.filter(spamer=False) if p.openid)
+        openids = (p.openid for p in models.Profile.objects.filter(spamer=False) if p.openid)
         MIMETYPES = ['application/xml', 'text/xml', 'application/json', 'text/plain']
         accept = request.META.get('HTTP_ACCEPT', '')
         try:
