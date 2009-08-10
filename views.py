@@ -7,7 +7,8 @@ from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.contrib import auth
 
-from scipio import models, forms, signals, mimeparse
+from scipio import models, forms, signals
+from scipio.utils import mimeparse
 
 def _post_redirect(request):
     return request.POST.get('redirect', request.META.get('HTTP_REFERER', '/'))
