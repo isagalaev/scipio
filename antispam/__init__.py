@@ -9,7 +9,7 @@ class WhitelistHandler(object):
         except CleanOpenID.DoesNotExist:
             return False
 
-    def validate(self, request, **kwargs):
+    def validate(self, request):
         try:
             profile = request.user.scipio_profile
         except models.Profile.DoesNotExist:
@@ -24,7 +24,7 @@ class HoneyPotHandler(object):
     def __init__(self, fieldnames=['email']):
         self.fieldnames = fieldnames
 
-    def validate(self, request, **kwargs):
+    def validate(self, request):
         values = [request.POST.get(f) for f in self.fieldnames]
         if [v for v in values if v]:
             return 'spam'
@@ -38,18 +38,18 @@ class Conveyor(object):
             ]
         self.handlers = handlers
 
-    def validate(self, request, **kwargs):
+    def validate(self, request):
         status = None
         for handler in self.handelrs:
-            result = handlers.validate(request, **kwargs)
+            result = handlers.validate(request)
             if result in ['clean', 'spam']:
                 return result
             if result is not None:
                 status = result
         return status or 'clean'
 
-    def submit(self, kind, request, **kwargs):
-        for handler in self.handlers():
+    def submit(self, kind, spam_status, request):
+        for handler in self.handlers:
             func = getattr(handler, 'submit_%s' % kind, None)
             if func:
-                func(request, **kwargs)
+                func(spam_status, request)
