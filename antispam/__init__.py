@@ -42,7 +42,6 @@ class Conveyor(object):
         status = None
         for handler in self.handlers:
             result = handler.validate(request, **kwargs)
-            print handler.__class__.__name__, result
             if result in ['clean', 'spam']:
                 return result
             if result is not None:
