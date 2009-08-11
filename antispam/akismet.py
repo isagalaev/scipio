@@ -14,12 +14,12 @@ def _base_data(request):
         'HTTP_ACCEPT': request.META.get('HTTP_ACCEPT', ''),
     }
 
-def _post(op, request, index_url, **kwargs):
+def _post(op, request, blog, **kwargs):
     url = 'http://%s.rest.akismet.com/1.1/%s' % (
         settings.SCIPIO_AKISMET_KEY,
         op # comment-check, submit-spam, submit-ham
     )
-    data = dict(_base_data(request), blog=index_url)
+    data = dict(_base_data(request), blog=blog)
     data.update(kwargs)
     response = urlopen(Request(url,
         urlencode(data),
@@ -37,17 +37,17 @@ def _post(op, request, index_url, **kwargs):
     else:
         raise Exception('Unknown response from Akismet: %s' % response)
 
-class AkismetHandler(object):
-    def __init__(self, param_func=lambda r: {}):
-        self.param_func = param_func
+class AkismetBaseHandler(object):
+    def get_params(self, request, **kwargs):
+        return {}
 
-    def validate(self, request):
-        if _post('comment-check', request, **self.param_func(request)):
+    def validate(self, request, **kwargs):
+        if _post('comment-check', request, **self.get_params(request, **kwargs)):
             return 'akismet'
 
-    def submit_spam(self, spam_status, request):
-        _post('submit-spam', request, **self.param_func(request))
+    def submit_spam(self, spam_status, request, **kwargs):
+        _post('submit-spam', request, **self.get_params(request, **kwargs))
 
-    def submit_ham(self, spam_status, request):
+    def submit_ham(self, spam_status, request, **kwargs):
         if spam_status == 'akismet':
-            _post('submit-ham', request, **self.param_func(request))
+            _post('submit-ham', request, **self.get_params(request, **kwargs))
