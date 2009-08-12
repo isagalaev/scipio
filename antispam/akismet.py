@@ -30,14 +30,15 @@ def _post(op, request, **kwargs):
             'User-agent': 'Scipio/0.1',
         }
     )).read()
-    if response == 'true':
-        return True
-    elif response == 'false':
-        return False
-    elif response == 'invalid':
+    if response == 'invalid':
         raise Exception('Invalid Akismet key')
-    else:
-        raise Exception('Unknown response from Akismet: %s' % response)
+    if op == 'comment-check':
+        if response == 'true':
+            return True
+        elif response == 'false':
+            return False
+        else:
+            raise Exception('Unknown response from Akismet: %s' % response)
 
 class AkismetBaseHandler(object):
     def get_params(self, request, **kwargs):
