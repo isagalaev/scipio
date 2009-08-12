@@ -3,7 +3,7 @@ from urllib2 import urlopen, Request
 from django.utils.http import urlencode
 from django.conf import settings
 
-def _base_data(request):
+def _request_data(request):
     ip = request.META.get('HTTP_X_FORWARDED_FOR', '') or \
          request.META.get('REMOTE_ADDR', '')
     ip = ip.split(',')[0].strip()
@@ -14,12 +14,14 @@ def _base_data(request):
         'HTTP_ACCEPT': request.META.get('HTTP_ACCEPT', ''),
     }
 
-def _post(op, request, blog, **kwargs):
+def _post(op, request, **kwargs):
     url = 'http://%s.rest.akismet.com/1.1/%s' % (
         settings.SCIPIO_AKISMET_KEY,
         op # comment-check, submit-spam, submit-ham
     )
-    data = dict(_base_data(request), blog=blog)
+    data = {}
+    if request is not None:
+        data.update(_request_data(request))
     data.update(kwargs)
     response = urlopen(Request(url,
         urlencode(data),
@@ -39,15 +41,17 @@ def _post(op, request, blog, **kwargs):
 
 class AkismetBaseHandler(object):
     def get_params(self, request, **kwargs):
-        return {}
+        return {
+            'blog': utils.absolute_url('/'),
+        }
 
     def validate(self, request, **kwargs):
         if _post('comment-check', request, **self.get_params(request, **kwargs)):
             return 'akismet'
 
-    def submit_spam(self, spam_status, request, **kwargs):
-        _post('submit-spam', request, **self.get_params(request, **kwargs))
+    def submit_spam(self, **kwargs):
+        _post('submit-spam', **self.get_params(None, **kwargs))
 
-    def submit_ham(self, spam_status, request, **kwargs):
+    def submit_ham(self, spam_status, **kwargs):
         if spam_status == 'akismet':
-            _post('submit-ham', request, **self.get_params(request, **kwargs))
+            _post('submit-ham', **self.get_params(None, **kwargs))

@@ -48,8 +48,14 @@ class Conveyor(object):
                 status = result
         return status or 'clean'
 
-    def submit(self, kind, spam_status, request, **kwargs):
+    def submit_spam(self, **kwargs):
         for handler in self.handlers:
-            func = getattr(handler, 'submit_%s' % kind, None)
+            func = getattr(handler, 'submit_spam', None)
             if func:
-                func(spam_status, request, **kwargs)
+                func(**kwargs)
+
+    def submit_ham(self, spam_status, **kwargs):
+        for handler in self.handlers:
+            func = getattr(handler, 'submit_ham', None)
+            if func:
+                func(spam_status, **kwargs)
