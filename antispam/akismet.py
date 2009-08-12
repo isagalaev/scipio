@@ -50,8 +50,8 @@ class AkismetBaseHandler(object):
             return 'akismet'
 
     def submit_spam(self, **kwargs):
-        _post('submit-spam', **self.get_params(None, **kwargs))
+        _post('submit-spam', None, **self.get_params(None, **kwargs))
 
     def submit_ham(self, spam_status, **kwargs):
         if spam_status == 'akismet':
-            _post('submit-ham', **self.get_params(None, **kwargs))
+            _post('submit-ham', None, **self.get_params(None, **kwargs))
