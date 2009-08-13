@@ -35,9 +35,8 @@ def read_hcard(url):
             result = ''.join([s for s in el.recursiveChildGenerator() if isinstance(s, unicode)])
         return result.replace('\n',' ').strip()
 
-    info = dict((n, _parse_property(n)) for n in ['nickname', 'fn'])
     return {
-        'nickname': info['nickname'] or info['fn'],
+        'nickname': _parse_property('nickname') or _parse_property('fn') or '',
     }
 
 def get_names(openid_info):
