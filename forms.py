@@ -7,14 +7,14 @@ from django.conf import settings
 from scipio import models, authentication, utils
 
 class AuthForm(forms.Form):
-    openid_url = forms.CharField(label='OpenID', max_length=200, required=True)
+    openid_identity = forms.CharField(label='OpenID', max_length=200, required=True)
 
     def __init__(self, session, *args, **kwargs):
         forms.Form.__init__(self, *args, **kwargs)
         self.session = session
 
-    def clean_openid_url(self):
-        url = self.cleaned_data['openid_url'].strip()
+    def clean_openid_identity(self):
+        url = self.cleaned_data['openid_identity'].strip()
         try:
             self.request = authentication.create_request(url, self.session)
         except authentication.OpenIdError, e:
