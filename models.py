@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 from django.db import models
-from django.db.models.fields.related import SingleRelatedObjectDescriptor
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
