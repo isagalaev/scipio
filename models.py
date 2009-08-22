@@ -2,10 +2,11 @@
 from django.db import models
 from django.db.models.fields.related import SingleRelatedObjectDescriptor
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from scipio import utils
+from scipio import utils, signals
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='scipio_profile', primary_key=True)
@@ -24,6 +25,29 @@ class Profile(models.Model):
             return url
 
         return self.nickname or _pretty_url(self.openid)
+
+    @staticmethod
+    def from_openid(openid_info):
+        '''
+        Creates a Profile instance and a corresponding auth.User instance from
+        openid info obtained from openid.consumer.complete
+        '''
+        try:
+            profile = Profile.objects.get(openid=openid_info.identity_url)
+        except Profile.DoesNotExist:
+            username, nickname, autoupdate = utils.get_names(openid_info)
+            user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
+            profile = Profile.objects.create(
+                user = user,
+                openid = smart_unicode(openid_info.identity_url),
+                openid_server = smart_unicode(openid_info.endpoint.server_url),
+                nickname = nickname,
+                autoupdate = autoupdate,
+            )
+            profile.save()
+            print 'created'
+            signals.created.send(sender=profile)
+        return profile
 
     def update_profile(self):
         '''

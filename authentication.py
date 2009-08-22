@@ -2,12 +2,11 @@
 from openid.consumer.consumer import Consumer, SUCCESS, DiscoveryFailure
 from openid.extensions.sreg import SRegRequest
 from openid.store.filestore import FileOpenIDStore
-from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from scipio import models, utils, signals
+from scipio import models, utils
 
 class OpenIdBackend(object):
     def authenticate(self, session=None, query=None, return_path=None):
@@ -15,22 +14,8 @@ class OpenIdBackend(object):
         info = consumer.complete(query, utils.absolute_url(return_path))
         if info.status != SUCCESS:
             return None
-        try:
-            profile = models.Profile.objects.get(openid=info.identity_url)
-            user = profile.user
-        except models.Profile.DoesNotExist:
-            username, nickname, autoupdate = utils.get_names(info)
-            user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
-            profile = models.Profile.objects.create(
-                user = user,
-                openid = smart_unicode(info.identity_url),
-                openid_server = smart_unicode(info.endpoint.server_url),
-                nickname = nickname,
-                autoupdate = autoupdate,
-            )
-            profile.save()
-            signals.created.send(sender=profile)
-        return user
+        profile = models.Profile.from_openid(info)
+        return profile.user
 
     def get_user(self, user_id):
         try:
