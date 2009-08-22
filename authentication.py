@@ -14,7 +14,7 @@ class OpenIdBackend(object):
         info = consumer.complete(query, utils.absolute_url(return_path))
         if info.status != SUCCESS:
             return None
-        profile = models.Profile.from_openid(info)
+        profile = models.Profile.objects.from_openid(info)
         return profile.user
 
     def get_user(self, user_id):

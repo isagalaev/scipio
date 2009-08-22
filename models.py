@@ -7,6 +7,28 @@ from django.conf import settings
 
 from scipio import utils, signals
 
+class ProfileManager(models.Manager):
+    def from_openid(self, openid_info):
+        '''
+        Creates a Profile instance and a corresponding auth.User instance from
+        openid info obtained from openid.consumer.complete
+        '''
+        try:
+            profile = self.get(openid=openid_info.identity_url)
+        except self.model.DoesNotExist:
+            username, nickname, autoupdate = utils.get_names(openid_info)
+            user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
+            profile = self.create(
+                user = user,
+                openid = smart_unicode(openid_info.identity_url),
+                openid_server = smart_unicode(openid_info.endpoint.server_url),
+                nickname = nickname,
+                autoupdate = autoupdate,
+            )
+            profile.save()
+            signals.created.send(sender=profile)
+        return profile
+
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='scipio_profile', primary_key=True)
     openid = models.CharField(max_length=200, unique=True)
@@ -14,6 +36,8 @@ class Profile(models.Model):
     nickname = models.CharField(_(u'Nickname'), max_length=200, blank=True)
     autoupdate = models.BooleanField(_(u'Update automatically'), default=True, db_index=True)
     spamer = models.NullBooleanField()
+
+    objects = ProfileManager()
 
     def __unicode__(self):
 
@@ -24,29 +48,6 @@ class Profile(models.Model):
             return url
 
         return self.nickname or _pretty_url(self.openid)
-
-    @staticmethod
-    def from_openid(openid_info):
-        '''
-        Creates a Profile instance and a corresponding auth.User instance from
-        openid info obtained from openid.consumer.complete
-        '''
-        try:
-            profile = Profile.objects.get(openid=openid_info.identity_url)
-        except Profile.DoesNotExist:
-            username, nickname, autoupdate = utils.get_names(openid_info)
-            user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
-            profile = Profile.objects.create(
-                user = user,
-                openid = smart_unicode(openid_info.identity_url),
-                openid_server = smart_unicode(openid_info.endpoint.server_url),
-                nickname = nickname,
-                autoupdate = autoupdate,
-            )
-            profile.save()
-            print 'created'
-            signals.created.send(sender=profile)
-        return profile
 
     def update_profile(self):
         '''
