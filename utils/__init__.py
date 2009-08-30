@@ -29,7 +29,7 @@ def read_hcard(url):
         el = vcard.find(None, {'class': re.compile(r'\b%s\b' % class_name)})
         if el is None:
             return
-        if el.name == u'abbr' and el['title']:
+        if el.name == u'abbr' and el.get('title'):
             result = el['title']
         else:
             result = ''.join([s for s in el.recursiveChildGenerator() if isinstance(s, unicode)])
