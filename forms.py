@@ -10,7 +10,7 @@ class AuthForm(forms.Form):
     openid_identity = forms.CharField(label='OpenID', max_length=200, required=True)
 
     def __init__(self, session, *args, **kwargs):
-        forms.Form.__init__(self, *args, **kwargs)
+        super(AuthForm, self).__init__(*args, **kwargs)
         self.session = session
 
     def clean_openid_identity(self):
