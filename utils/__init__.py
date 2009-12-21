@@ -2,7 +2,10 @@
 import re
 from urllib2 import urlopen
 from datetime import datetime
-import md5
+try:
+    from hashlib import md5
+except ImportError:
+    from md5 import new as md5
 import urlparse
 
 from BeautifulSoup import BeautifulSoup
@@ -69,7 +72,7 @@ def get_names(openid_info):
             return smart_unicode(bits[0])
 
     def unique_name():
-        name = u'scipio_%s' % md5.new(openid_info.identity_url + str(datetime.now())).hexdigest()
+        name = u'scipio_%s' % md5(openid_info.identity_url + str(datetime.now())).hexdigest()
         return name[:30]
 
     nickname = from_sreg() or from_hcard() or from_url() or unique_name()
