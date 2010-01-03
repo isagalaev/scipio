@@ -10,7 +10,7 @@ log = logging.getLogger('scipio')
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--quiet', action='store_true', dest='quiet', default=False,
-            help=u'Не выводить сообщения, кроме ошибок'),
+            help=u'Do not display messages other than errors'),
     )
     help = u'Updates profile data from OpenID urls'
 

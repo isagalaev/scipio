@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 
-# Директория, в которой лежат сессии OpenID.
-# Без нее авторизация по OpenID работать не будет.
+# OpenID sessions dir.
+# OpenID authentication will NOT work without it.
 SCIPIO_STORE_ROOT = ''
 
-# URL, который передается на OpenID-сервер для обозначения,
-# где будет действовать авторизация. Не должно заканчиваться на '/'.
-# Если не задано, передается URL всего сайта
+# URL passed to OpenID-provider to identify site that requests authentication.
+# Must NOT ends with '/'.
+# Complete site URL is passed if value is empty.
 SCIPIO_TRUST_URL = ''
 
-# Ключ для Akismet
+# Akismet key
 SCIPIO_AKISMET_KEY = ''

@@ -9,9 +9,9 @@ log = logging.getLogger('scipio')
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--quiet', action='store_true', dest='quiet', default=False,
-            help=u'Не выводить сообщения, кроме ошибок'),
+            help=u'Do not display messages other than errors'),
     )
-    help = u'Обновляет "белые списки" OpenID из внешних источников'
+    help = u'Updates OpenID "white lists" from external sources'
 
     def handle_noargs(self, quiet=False, **base_options):
         from scipio.models import CleanOpenID, WhitelistSource
