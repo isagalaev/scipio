@@ -14,6 +14,13 @@ def _post_redirect(request):
     return request.POST.get('redirect', request.META.get('HTTP_REFERER', '/'))
 
 def login(request):
+    """
+    Shows and processes an OpenID login form. The successful response from the
+    view is a redirect to user's OpenID server. The server will then return the
+    user back to `complete` view.
+
+    Requires a template "scipio/login.html".
+    """
     if request.method == 'POST':
         form = forms.AuthForm(request.session, request.POST)
         if form.is_valid():
@@ -29,6 +36,14 @@ def login(request):
     )
 
 def complete(request, message=_('Authentication failed')):
+    """
+    Completes authentication process after user returns from the OpenID server.
+
+    If authentication is successful sends a signal about it which an
+    application can catch and return some HttpResponse. If no HttpResponse
+    returned from signal handlers the view just redirect a user to the original
+    page from which authentication had started.
+    """
     user = auth.authenticate(session=request.session, query=request.GET, return_path=request.path)
     if not user:
         return http.HttpResponseForbidden(message)
@@ -39,20 +54,34 @@ def complete(request, message=_('Authentication failed')):
             response = r
             break
     else:
-        response = None
-    return response or redirect(request.GET.get('redirect', '/'))
+        response = redirect(request.GET.get('redirect', '/'))
+    return response
 
 def complete_login(sender, user, op=None, **kwargs):
+    """
+    A default handler for login completion that actually athenticates a Django
+    user and persists it in a session.
+    """
     if op == 'login':
         auth.login(sender, user)
 signals.authenticated.connect(complete_login)
 
 @require_POST
 def logout(request):
+    """
+    Processes logout form by logging out Django user.
+    """
     auth.logout(request)
     return redirect(_post_redirect(request))
 
 def openid_whitelist(request):
+    """
+    Shows current list of white-listed users to share it with whoever wants to
+    know users trusted by this site.
+
+    The list is available in three formats (text, xml, json). The format is
+    negotiated by HTTP spec using Accept header.
+    """
     if request.method == 'POST':
         try:
             profile = models.Profile.objects.get(pk=int(request.POST['id']))
