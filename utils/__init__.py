@@ -8,7 +8,7 @@ except ImportError:
     from md5 import new as md5
 import urlparse
 
-from BeautifulSoup import BeautifulSoup
+from html5lib import HTMLParser
 from openid.extensions.sreg import SRegResponse
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
@@ -21,22 +21,28 @@ def absolute_url(url):
 
 def read_hcard(url):
     try:
-        soup = BeautifulSoup(urlopen(url).read(512 * 1024))
+        dom = HTMLParser().parse(urlopen(url).read(512 * 1024))
     except IOError:
         return
-    vcard = soup.find(None, {'class': re.compile(r'\bvcard\b')})
+
+    def _find(node, class_name):
+        for child in (c for c in node if c.type == 5):
+            if re.search(r'\b%s\b' % class_name, child.attributes.get('class', '')):
+                return child
+
+    vcard = _find(dom, 'vcard')
     if vcard is None:
         return
 
     def _parse_property(class_name):
-        el = vcard.find(None, {'class': re.compile(r'\b%s\b' % class_name)})
+        el = _find(vcard, class_name)
         if el is None:
             return
-        if el.name == u'abbr' and el.get('title'):
-            result = el['title']
+        if el.name == 'abbr' and 'title' in el.attributes:
+            result = el.attributes['title']
         else:
-            result = ''.join([s for s in el.recursiveChildGenerator() if isinstance(s, unicode)])
-        return result.replace('\n',' ').strip()
+            result = u''.join(s.value for s in el if s.type == 4)
+        return result.replace(u'\n', u' ').strip()
 
     return {
         'nickname': _parse_property('nickname') or _parse_property('fn') or '',
