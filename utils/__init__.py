@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import re
 from urllib2 import urlopen
+import cgi
 from datetime import datetime
 try:
     from hashlib import md5
@@ -21,7 +22,11 @@ def absolute_url(url):
 
 def read_hcard(url):
     try:
-        dom = HTMLParser().parse(urlopen(url).read(512 * 1024))
+        f = urlopen(url)
+        content_type = f.info().getheader('content-type', 'text/html')
+        value, params = cgi.parse_header(content_type)
+        charset = params.get('charset', 'utf-8').replace("'", '')
+        dom = HTMLParser().parse(urlopen(url).read(512 * 1024).decode(charset))
     except IOError:
         return
 
