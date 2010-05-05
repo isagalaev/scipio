@@ -26,7 +26,7 @@ def read_hcard(url):
         content_type = f.info().getheader('content-type', 'text/html')
         value, params = cgi.parse_header(content_type)
         charset = params.get('charset', 'utf-8').replace("'", '')
-        dom = HTMLParser().parse(urlopen(url).read(512 * 1024).decode(charset))
+        dom = HTMLParser().parse(urlopen(url).read(512 * 1024).decode(charset, 'ignore'))
     except IOError:
         return
 
