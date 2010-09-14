@@ -49,9 +49,9 @@ def complete(request, message=_('Authentication failed')):
         return http.HttpResponseForbidden(message)
     data = dict((str(k[7:]), v) for k, v in request.GET.items() if k.startswith('scipio.'))
     results = signals.authenticated.send(request, user=user, **data)
-    for r in results:
-        if isinstance(r, http.HttpResponse):
-            response = r
+    for callback, result in results:
+        if isinstance(result, http.HttpResponse):
+            response = result
             break
     else:
         response = redirect(request.GET.get('redirect', '/'))
