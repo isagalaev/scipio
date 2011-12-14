@@ -10,6 +10,7 @@ setup(
         'scipio.antispam',
         'scipio.management',
         'scipio.management.commands',
+        'scipio.migrations',
         'scipio.utils',
     ],
 
