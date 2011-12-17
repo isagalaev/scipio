@@ -48,14 +48,17 @@ def complete(request, message=_('Authentication failed')):
 
     if not user:
         return http.HttpResponseForbidden(message)
+
     data = dict((str(k[7:]), v) for k, v in request.GET.items() if k.startswith('scipio.'))
     results = signals.authenticated.send(request, user=user, **data)
+
     for callback, result in results:
         if isinstance(result, http.HttpResponse):
             response = result
             break
     else:
         response = redirect(request.GET.get('redirect', '/'))
+
     return response
 
 def complete_login(sender, user, op=None, **kwargs):
