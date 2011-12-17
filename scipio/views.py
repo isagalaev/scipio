@@ -24,7 +24,7 @@ def login(request):
     if request.method == 'POST':
         form = forms.AuthForm(request.session, request.POST)
         if form.is_valid():
-            after_auth_redirect = form.auth_redirect(_post_redirect(request), {'op': 'login'})
+            after_auth_redirect = form.auth_redirect(request, _post_redirect(request), {'op': 'login'})
             return redirect(after_auth_redirect)
         return_url = _post_redirect(request)
     else:
@@ -44,7 +44,8 @@ def complete(request, message=_('Authentication failed')):
     returned from signal handlers the view just redirect a user to the original
     page from which authentication had started.
     """
-    user = auth.authenticate(session=request.session, query=request.GET, return_path=request.path)
+    user = auth.authenticate(request=request, query=request.GET)
+
     if not user:
         return http.HttpResponseForbidden(message)
     data = dict((str(k[7:]), v) for k, v in request.GET.items() if k.startswith('scipio.'))

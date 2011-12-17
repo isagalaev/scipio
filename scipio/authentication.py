@@ -9,12 +9,15 @@ from django.conf import settings
 from scipio import models, utils
 
 class OpenIdBackend(object):
-    def authenticate(self, session=None, query=None, return_path=None):
-        consumer = get_consumer(session)
-        info = consumer.complete(query, utils.absolute_url(return_path))
+    def authenticate(self, request=None, query=None):
+        consumer = get_consumer(request.session)
+        info = consumer.complete(query, utils.absolute_url(request, request.path))
+
         if info.status != SUCCESS:
             return None
+
         profile = models.Profile.objects.from_openid(info)
+
         return profile.user
 
     def get_user(self, user_id):
