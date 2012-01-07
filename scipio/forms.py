@@ -7,7 +7,7 @@ from django.conf import settings
 from scipio import models, authentication, utils
 
 class AuthForm(forms.Form):
-    openid_identifier = forms.CharField(label='OpenID', max_length=200, required=True)
+    openid_identifier = forms.CharField(label=_('OpenID'), max_length=200, required=True)
 
     def __init__(self, session, *args, **kwargs):
         super(AuthForm, self).__init__(*args, **kwargs)
