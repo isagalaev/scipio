@@ -3,7 +3,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
-from django.conf import settings
 
 from scipio import utils, signals
 
@@ -31,11 +30,11 @@ class ProfileManager(models.Manager):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='scipio_profile', primary_key=True)
-    openid = models.CharField(max_length=200, unique=True)
-    openid_server = models.CharField(max_length=200, blank=True)
+    openid = models.CharField(_(u'OpenID'), max_length=200, unique=True)
+    openid_server = models.CharField(_(u'OpenID Server'), max_length=200, blank=True)
     nickname = models.CharField(_(u'Nickname'), max_length=200, blank=True)
     autoupdate = models.BooleanField(_(u'Update automatically'), default=True, db_index=True)
-    spamer = models.NullBooleanField()
+    spamer = models.NullBooleanField(_(u'Spammer'))
 
     objects = ProfileManager()
 
@@ -65,14 +64,14 @@ class Profile(models.Model):
         return changes
 
 class WhitelistSource(models.Model):
-    url = models.URLField()
+    url = models.URLField(_(u'URL'))
 
     def __unicode__(self):
         return self.url
 
 class CleanOpenID(models.Model):
-    openid = models.CharField(max_length=200, db_index=True)
-    source = models.ForeignKey(WhitelistSource)
+    openid = models.CharField(_(u'OpenID'), max_length=200, db_index=True)
+    source = models.ForeignKey(WhitelistSource, verbose_name=_(u'Source'))
 
     class Meta:
         unique_together = [('openid', 'source')]
