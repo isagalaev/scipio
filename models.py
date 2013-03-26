@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
 from django.conf import settings
 
@@ -19,8 +18,8 @@ class ProfileManager(models.Manager):
             user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
             profile = self.create(
                 user = user,
-                openid = smart_unicode(openid_info.identity_url),
-                openid_server = smart_unicode(openid_info.endpoint.server_url),
+                openid = openid_info.identity_url,
+                openid_server = openid_info.endpoint.server_url,
                 nickname = nickname,
                 autoupdate = autoupdate,
             )
