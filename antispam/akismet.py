@@ -1,4 +1,4 @@
-from urllib2 import urlopen, Request
+from urllib.request import urlopen, Request
 
 from django.utils.http import urlencode
 from django.conf import settings

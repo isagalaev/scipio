@@ -17,7 +17,7 @@ class AuthForm(forms.Form):
         url = self.cleaned_data['openid_identifier'].strip()
         try:
             self.request = authentication.create_request(url, self.session)
-        except authentication.OpenIdError, e:
+        except authentication.OpenIdError as e:
             raise forms.ValidationError(e)
         return url
 
@@ -25,7 +25,7 @@ class AuthForm(forms.Form):
         trust_url = settings.SCIPIO_TRUST_URL or utils.absolute_url('/')
         return_to = utils.absolute_url(reverse('scipio.views.complete'))
         self.request.return_to_args['redirect'] = target
-        data = dict(('scipio.%s' % k, v) for k, v in data.items())
+        data = {'scipio.%s' % k: v for k, v in data.items()}
         self.request.return_to_args.update(data)
         return self.request.redirectURL(trust_url, return_to)
 

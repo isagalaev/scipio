@@ -41,7 +41,7 @@ def create_request(openid_url, session):
         request = consumer.begin(openid_url)
         if request is None:
             errors.append(_('OpenID service is not found'))
-    except (DiscoveryFailure, OpenIdSetupError, ValueError), e:
+    except (DiscoveryFailure, OpenIdSetupError, ValueError) as e:
         errors.append(str(e[0]))
     if errors:
         raise OpenIdError(errors)

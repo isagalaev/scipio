@@ -28,5 +28,5 @@ class Command(NoArgsCommand):
                         smart_str(nv),
                     ) for k, (ov, nv) in changes.items())
                     log.info('Updated profile ID=%s: %s' % (profile.pk, changes_str))
-            except Exception, e:
+            except Exception as e:
                 log.error('Profile ID=%s: %s' % (profile.pk, e))

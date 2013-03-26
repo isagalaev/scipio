@@ -1,12 +1,12 @@
 import re
-from urllib2 import urlopen
+from urllib.request import urlopen
 import cgi
 from datetime import datetime
 try:
     from hashlib import md5
 except ImportError:
     from md5 import new as md5
-import urlparse
+import urllib.parse
 
 from html5lib import HTMLParser
 from openid.extensions.sreg import SRegResponse
@@ -69,7 +69,7 @@ def get_names(openid_info):
         return hcard and hcard.get('nickname')
 
     def from_url():
-        schema, host, path, query, fragment = urlparse.urlsplit(openid_info.identity_url)
+        schema, host, path, query, fragment = urllib.parse.urlsplit(openid_info.identity_url)
         if query: # it's definitely not meant to be remotely readable
             return '%s%s?%s' % (host, path, query)
         bits = [b for b in path.split('/') if b]
