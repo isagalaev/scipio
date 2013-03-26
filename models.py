@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
@@ -33,8 +32,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, related_name='scipio_profile', primary_key=True)
     openid = models.CharField(max_length=200, unique=True)
     openid_server = models.CharField(max_length=200, blank=True)
-    nickname = models.CharField(_(u'Nickname'), max_length=200, blank=True)
-    autoupdate = models.BooleanField(_(u'Update automatically'), default=True, db_index=True)
+    nickname = models.CharField(_('Nickname'), max_length=200, blank=True)
+    autoupdate = models.BooleanField(_('Update automatically'), default=True, db_index=True)
     spamer = models.NullBooleanField()
 
     objects = ProfileManager()

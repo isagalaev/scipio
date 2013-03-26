@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 import re
 from urllib2 import urlopen
 import cgi
@@ -46,8 +45,8 @@ def read_hcard(url):
         if el.name == 'abbr' and 'title' in el.attributes:
             result = el.attributes['title']
         else:
-            result = u''.join(s.value for s in el if s.type == 4)
-        return result.replace(u'\n', u' ').strip()
+            result = ''.join(s.value for s in el if s.type == 4)
+        return result.replace('\n', ' ').strip()
 
     return {
         'nickname': _parse_property('nickname') or _parse_property('fn') or '',
@@ -72,7 +71,7 @@ def get_names(openid_info):
     def from_url():
         schema, host, path, query, fragment = urlparse.urlsplit(openid_info.identity_url)
         if query: # it's definitely not meant to be remotely readable
-            return u'%s%s?%s' % (host, path, query)
+            return '%s%s?%s' % (host, path, query)
         bits = [b for b in path.split('/') if b]
         if bits:
             if len(bits[-1]) > 20: # looks like some unreadable hash
@@ -83,7 +82,7 @@ def get_names(openid_info):
             return smart_unicode(bits[0])
 
     def unique_name():
-        name = u'scipio_%s' % md5(openid_info.identity_url + str(datetime.now())).hexdigest()
+        name = 'scipio_%s' % md5(openid_info.identity_url + str(datetime.now())).hexdigest()
         return name[:30]
 
     nickname = from_sreg() or from_hcard() or from_url() or unique_name()

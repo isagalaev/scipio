@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from optparse import make_option
 import logging
 
@@ -10,9 +9,9 @@ log = logging.getLogger('scipio')
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--quiet', action='store_true', dest='quiet', default=False,
-            help=u'Do not display messages other than errors'),
+            help='Do not display messages other than errors'),
     )
-    help = u'Updates profile data from OpenID urls'
+    help = 'Updates profile data from OpenID urls'
 
     def handle_noargs(self, quiet=False, **base_options):
         from scipio.models import Profile
