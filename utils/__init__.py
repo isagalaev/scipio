@@ -12,7 +12,7 @@ from html5lib import HTMLParser
 from openid.extensions.sreg import SRegResponse
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
-from django.utils.encoding import smart_unicode
+
 
 def absolute_url(url):
     if url.startswith('http://') or url.startswith('https://'):
@@ -63,7 +63,7 @@ def get_names(openid_info):
     def from_sreg():
         sreg_response = SRegResponse.fromSuccessResponse(openid_info)
         if sreg_response is not None:
-            return smart_unicode(sreg_response.get('nickname', sreg_response.get('fullname')))
+            return sreg_response.get('nickname', sreg_response.get('fullname'))
 
     def from_hcard():
         return hcard and hcard.get('nickname')
@@ -75,11 +75,11 @@ def get_names(openid_info):
         bits = [b for b in path.split('/') if b]
         if bits:
             if len(bits[-1]) > 20: # looks like some unreadable hash
-                return smart_unicode(host + path)
-            return smart_unicode(bits[-1])
+                return host + path
+            return bits[-1]
         bits = [b for b in host.split('.') if b]
         if len(bits) > 2:
-            return smart_unicode(bits[0])
+            return bits[0]
 
     def unique_name():
         name = 'scipio_%s' % md5(openid_info.identity_url + str(datetime.now())).hexdigest()
