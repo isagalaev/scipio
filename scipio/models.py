@@ -36,7 +36,7 @@ class Profile(models.Model):
 
     objects = ProfileManager()
 
-    def __unicode__(self):
+    def __str__(self):
 
         def _pretty_url(url):
             url = url[url.index('://') + 3:]
@@ -64,7 +64,7 @@ class Profile(models.Model):
 class WhitelistSource(models.Model):
     url = models.URLField(_('URL'))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.url
 
 class CleanOpenID(models.Model):
@@ -77,5 +77,5 @@ class CleanOpenID(models.Model):
         verbose_name = 'Clean OpenID'
         verbose_name_plural = 'Clean OpenIDs'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.openid
