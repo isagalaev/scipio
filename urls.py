@@ -1,5 +1,4 @@
-# -*- coding:utf-8 -*-
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 
 from scipio import views
 
