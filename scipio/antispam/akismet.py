@@ -43,7 +43,7 @@ def _post(op, request, **kwargs):
 class AkismetBaseHandler(object):
     def get_params(self, request, **kwargs):
         return {
-            'blog': utils.absolute_url('/'),
+            'blog': utils.absolute_url(request, '/'),
         }
 
     def validate(self, request, **kwargs):

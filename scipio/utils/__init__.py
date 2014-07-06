@@ -12,12 +12,19 @@ from html5lib import HTMLParser
 from openid.extensions.sreg import SRegResponse
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
+from django.conf import settings
 
 
-def absolute_url(url):
+def absolute_url(request, url):
     if url.startswith('http://') or url.startswith('https://'):
         return url
-    return 'http://%s%s' % (Site.objects.get_current().domain, url)
+
+    if settings.SCIPIO_USE_CONTRIB_SITES:
+        domain = Site.objects.get_current().domain
+    else:
+        domain = request.get_host()
+
+    return 'http://%s%s' % (domain, url)
 
 def read_hcard(url):
     try:

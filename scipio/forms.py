@@ -7,7 +7,7 @@ from django.conf import settings
 from scipio import models, authentication, utils
 
 class AuthForm(forms.Form):
-    openid_identifier = forms.CharField(label='OpenID', max_length=200, required=True)
+    openid_identifier = forms.CharField(label=_('OpenID'), max_length=200, required=True)
 
     def __init__(self, session, *args, **kwargs):
         super(AuthForm, self).__init__(*args, **kwargs)
@@ -21,9 +21,9 @@ class AuthForm(forms.Form):
             raise forms.ValidationError(e)
         return url
 
-    def auth_redirect(self, target, data={}):
-        trust_url = settings.SCIPIO_TRUST_URL or utils.absolute_url('/')
-        return_to = utils.absolute_url(reverse('scipio.views.complete'))
+    def auth_redirect(self, request, target, data={}):
+        trust_url = settings.SCIPIO_TRUST_URL or utils.absolute_url(request, '/')
+        return_to = utils.absolute_url(request, reverse('scipio.views.complete'))
         self.request.return_to_args['redirect'] = target
         data = {'scipio.%s' % k: v for k, v in data.items()}
         self.request.return_to_args.update(data)

@@ -11,3 +11,6 @@ SCIPIO_TRUST_URL = ''
 
 # Akismet key
 SCIPIO_AKISMET_KEY = ''
+
+# Use `django.contrib.sites` for current domain determination
+SCIPIO_USE_CONTRIB_SITES = True
