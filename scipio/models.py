@@ -62,14 +62,14 @@ class Profile(models.Model):
         return changes
 
 class WhitelistSource(models.Model):
-    url = models.URLField(_(u'URL'))
+    url = models.URLField(_('URL'))
 
     def __unicode__(self):
         return self.url
 
 class CleanOpenID(models.Model):
-    openid = models.CharField(_(u'OpenID'), max_length=200, db_index=True)
-    source = models.ForeignKey(WhitelistSource, verbose_name=_(u'Source'))
+    openid = models.CharField(_('OpenID'), max_length=200, db_index=True)
+    source = models.ForeignKey(WhitelistSource, verbose_name=_('Source'))
 
     class Meta:
         unique_together = [('openid', 'source')]
