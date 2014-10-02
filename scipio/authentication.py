@@ -8,6 +8,7 @@ from django.conf import settings
 
 from scipio import models, utils
 
+
 class OpenIdBackend(object):
     def authenticate(self, request=None, query=None):
         consumer = get_consumer(request.session)
@@ -45,7 +46,7 @@ def create_request(openid_url, session):
         if request is None:
             errors.append(_('OpenID service is not found'))
     except (DiscoveryFailure, OpenIdSetupError, ValueError) as e:
-        errors.append(str(e[0]))
+        errors.append(str(e))
     if errors:
         raise OpenIdError(errors)
     sreg_request = SRegRequest(optional=['nickname', 'fullname'])

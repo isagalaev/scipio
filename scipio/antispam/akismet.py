@@ -24,12 +24,12 @@ def _post(op, request, **kwargs):
         data.update(_request_data(request))
     data.update(kwargs)
     response = urlopen(Request(url,
-        urlencode(data),
+        urlencode(data).encode('utf-8'),
         {
             'Content-type': 'application/x-www-form-urlencoded',
             'User-agent': 'Scipio/0.1',
         }
-    )).read()
+    )).read().decode('utf-8')
     if response == 'invalid':
         raise Exception('Invalid Akismet key')
     if op == 'comment-check':
