@@ -65,7 +65,7 @@ def get_names(openid_info):
     meant to be unique and as nice as possible, a nickname is what a user
     explicitly recommends to use or as nice as possible.
     '''
-    hcard = read_hcard(openid_info.identity_url)
+    hcard = read_hcard(openid_info.claimed_id)
 
     def from_sreg():
         sreg_response = SRegResponse.fromSuccessResponse(openid_info)
@@ -76,7 +76,7 @@ def get_names(openid_info):
         return hcard and hcard.get('nickname')
 
     def from_url():
-        schema, host, path, query, fragment = urllib.parse.urlsplit(openid_info.identity_url)
+        schema, host, path, query, fragment = urllib.parse.urlsplit(openid_info.claimed_id)
         if query: # it's definitely not meant to be remotely readable
             return '%s%s?%s' % (host, path, query)
         bits = [b for b in path.split('/') if b]
@@ -89,7 +89,7 @@ def get_names(openid_info):
             return bits[0]
 
     def unique_name():
-        name = 'scipio_%s' % md5(openid_info.identity_url + str(datetime.now())).hexdigest()
+        name = 'scipio_%s' % md5(openid_info.claimed_id + str(datetime.now())).hexdigest()
         return name[:30]
 
     nickname = from_sreg() or from_hcard() or from_url() or unique_name()

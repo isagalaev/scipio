@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from openid.consumer.consumer import Consumer, SUCCESS, DiscoveryFailure
+from openid.consumer import Consumer, AuthenticationError
 from openid.extensions.sreg import SRegRequest
 from openid.store.filestore import FileOpenIDStore
 from django.utils.translation import ugettext_lazy as _
@@ -12,14 +12,12 @@ from scipio import models, utils
 class OpenIdBackend(object):
     def authenticate(self, request=None, query=None):
         consumer = get_consumer(request.session)
-        info = consumer.complete(query, utils.absolute_url(request, request.path))
-
-        if info.status != SUCCESS:
-            return None
-
-        profile = models.Profile.objects.from_openid(info)
-
-        return profile.user
+        try:
+            info = consumer.complete(query, utils.absolute_url(request, request.path))
+            profile = models.Profile.objects.from_openid(info)
+            return profile.user
+        except AuthenticationError:
+            pass
 
     def get_user(self, user_id):
         try:
@@ -45,7 +43,7 @@ def create_request(openid_url, session):
         request = consumer.begin(openid_url)
         if request is None:
             errors.append(_('OpenID service is not found'))
-    except (DiscoveryFailure, OpenIdSetupError, ValueError) as e:
+    except Exception as e:
         errors.append(str(e))
     if errors:
         raise OpenIdError(errors)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
+from openid.message import OPENID_NS
 
 from scipio import utils, signals
 
@@ -11,14 +12,14 @@ class ProfileManager(models.Manager):
         openid info obtained from openid.consumer.complete
         '''
         try:
-            profile = self.get(openid=openid_info.identity_url)
+            profile = self.get(openid=openid_info.claimed_id)
         except self.model.DoesNotExist:
             username, nickname, autoupdate = utils.get_names(openid_info)
             user = User.objects.create_user(username, 'user@scipio', User.objects.make_random_password())
             profile = self.create(
                 user = user,
-                openid = openid_info.identity_url,
-                openid_server = openid_info.endpoint.server_url,
+                openid = openid_info.claimed_id,
+                openid_server = openid_info.getSigned(OPENID_NS, 'op_endpoint'),
                 nickname = nickname,
                 autoupdate = autoupdate,
             )
