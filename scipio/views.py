@@ -1,8 +1,8 @@
-# -*- coding:utf-8 -*-
+import json
+
 from django.views.decorators.http import require_POST
 from django import http
 from django.utils.translation import ugettext as _
-from django.utils import simplejson
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.contrib import auth
@@ -117,7 +117,7 @@ def openid_whitelist(request):
             return response
         if mimetype == 'application/json':
             response = http.HttpResponse(mimetype=mimetype)
-            simplejson.dump(list(openids), response)
+            json.dump(list(openids), response)
             return response
         if mimetype == 'text/plain':
             return http.HttpResponse((o + '\n' for o in openids), mimetype=mimetype)
