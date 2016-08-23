@@ -4,13 +4,12 @@ from distutils.core import setup
 
 setup(
     name='scipio',
-    version='0.1',
+    version='0.1.1',
     packages=[
         'scipio',
         'scipio.antispam',
         'scipio.management',
         'scipio.management.commands',
-        'scipio.migrations',
         'scipio.utils',
     ],
 

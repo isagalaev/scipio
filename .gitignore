@@ -1,0 +1,10 @@
+*~
+*#
+*.pyc
+*.mo
+/src
+/build
+/venv/
+/cache/
+/output/
+__pycache__

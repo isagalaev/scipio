@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 import json
 
 from django.views.decorators.http import require_POST
